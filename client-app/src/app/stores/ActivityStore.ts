@@ -1,7 +1,9 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, configure, runInAction } from 'mobx';
 import { createContext, SyntheticEvent } from 'react';
 import { IActivity } from '../models/activity';
 import agent from '../api/agent';
+
+configure({ enforceActions: 'always' });
 
 class ActivityStore {
   @observable activityRegistry = new Map();
@@ -22,14 +24,18 @@ class ActivityStore {
     this.loadingInitial = true;
     try {
       const activities = await agent.Activities.list();
-      activities.forEach((activity) => {
-        activity.date = activity.date.split('.')[0];
-        this.activityRegistry.set(activity.id, activity);
+      runInAction('loading activities ...', () => {
+        activities.forEach((activity) => {
+          activity.date = activity.date.split('.')[0];
+          this.activityRegistry.set(activity.id, activity);
+        });
       });
     } catch (error) {
       console.log(error);
     } finally {
-      this.loadingInitial = false;
+      runInAction('close the loading spinner ...', () => {
+        this.loadingInitial = false;
+      });
     }
   };
 
@@ -42,12 +48,16 @@ class ActivityStore {
     this.submitting = true;
     try {
       await agent.Activities.create(activity);
-      this.activityRegistry.set(activity.id, activity);
-      this.selectedActivity = activity;
+      runInAction('creating activities ...', () => {
+        this.activityRegistry.set(activity.id, activity);
+        this.selectedActivity = activity;
+      });
     } catch (error) {
       console.log(error);
     } finally {
-      this.submitting = false;
+      runInAction('disable Submit[Create] spinner ...', () => {
+        this.submitting = false;
+      });
     }
   };
 
@@ -73,13 +83,17 @@ class ActivityStore {
     this.submitting = true;
     try {
       await agent.Activities.update(activity);
-      this.activityRegistry.set(activity.id, activity);
-      this.selectedActivity = activity;
-      this.editMode = false;
+      runInAction('editing activity ...', () => {
+        this.activityRegistry.set(activity.id, activity);
+        this.selectedActivity = activity;
+        this.editMode = false;
+      });
     } catch (error) {
       console.log(error);
     } finally {
-      this.submitting = false;
+      runInAction('disable Submit[Update] spinner ...', () => {
+        this.submitting = false;
+      });
     }
   };
 
@@ -91,12 +105,16 @@ class ActivityStore {
     this.target = event.currentTarget.name;
     try {
       await agent.Activities.delete(id);
-      this.activityRegistry.delete(id);
+      runInAction('deleting activity ...', () => {
+        this.activityRegistry.delete(id);
+      });
     } catch (error) {
       console.log(error);
     } finally {
-      this.submitting = false;
-      this.target = '';
+      runInAction('disable Delete spinner ...', () => {
+        this.submitting = false;
+        this.target = '';
+      });
     }
   };
 }
