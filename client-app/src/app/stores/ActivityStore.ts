@@ -57,7 +57,7 @@ class ActivityStore {
   };
 
   @action openEditForm = (id: string) => {
-    this.selectActivity = this.activityRegistry.get(id);
+    this.selectedActivity = this.activityRegistry.get(id);
     this.editMode = true;
   };
 
