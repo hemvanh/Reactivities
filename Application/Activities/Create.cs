@@ -12,6 +12,7 @@ namespace Application.Activities
     {
         public class Command : IRequest
         {
+            //* handler props
             public Guid Id { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
@@ -20,7 +21,6 @@ namespace Application.Activities
             public string City { get; set; }
             public string Venue { get; set; }
         }
-
         public class CommandValidator : AbstractValidator<Command>
         {
             public CommandValidator()
@@ -33,7 +33,6 @@ namespace Application.Activities
                 RuleFor(x => x.Venue).NotEmpty();
             }
         }
-
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;

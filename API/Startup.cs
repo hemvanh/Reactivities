@@ -37,7 +37,7 @@ namespace API
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
-            services.AddControllers().AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Edit>(); });
+            services.AddControllers().AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Create>(); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

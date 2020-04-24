@@ -45,8 +45,9 @@ namespace Application.Activities
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                //* handler logic
                 var activity = await _context.Activities.FindAsync(request.Id);
+
+                //! error handling
                 if (activity == null) throw new RestException(HttpStatusCode.NotFound, new { activity = "Not Found" });
 
                 activity.Title = request.Title ?? activity.Title;
