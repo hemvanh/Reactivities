@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Persistence;
@@ -16,16 +17,16 @@ namespace Infrastructure.Security
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataContext _dataContext;
-        public IsHostRequirementHandler(IHttpContextAccessor httpContextAccessor, DataContext dataContext)
+        private readonly IUserAccessor _userAccessor;
+        public IsHostRequirementHandler(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IUserAccessor userAccessor)
         {
+            _userAccessor = userAccessor;
             _dataContext = dataContext;
             _httpContextAccessor = httpContextAccessor;
-
         }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IsHostRequirement requirement)
         {
-            var currentUserName = _httpContextAccessor.HttpContext.User?.Claims?
-            .SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+            var currentUserName = _userAccessor.GetCurrentUsername();
 
             var activityId = Guid.Parse(
                 _httpContextAccessor.HttpContext.Request.RouteValues
